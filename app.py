@@ -35,7 +35,7 @@ def get_article(url):
     article_content = ""
 
     for content_element in article_content_element:
-        if content_element.get_attribute('class') is not None:
+        if bool(content_element.get_attribute('class')):
             continue
 
         article_content += f'{content_element.text}\n'
@@ -59,16 +59,16 @@ def get_all_articles(date, page=1):
     driver.get(url)
 
     try:
-        articles = wait.until(lambda drv: drv.find_elements_by_css_selector('article.articles--rows--item'))
+        articles = wait.until(lambda drv: drv.find_elements_by_css_selector('article[data-type="Article"]'))
 
         for article in articles:
             article_url_element = article.find_element_by_css_selector('a.articles--rows--item__title-link')
             article_url = article_url_element.get_attribute('href')
             get_article(article_url)
 
-        get_all_articles(date, page + 1)
+        get_all_articles(date, page=page+1)
     except TimeoutException:
         get_all_articles(date - timedelta(days=1))
 
 
-get_all_articles(datetime.today())
+get_all_articles(today)
